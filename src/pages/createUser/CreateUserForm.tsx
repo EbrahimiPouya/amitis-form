@@ -5,7 +5,11 @@ const CreateUserForm = () => {
         <div>
             <PersonalInfoStep user={{
                 name: 'ali',
-                family: 'ali'
+                family: 'ali',
+                email: 'a.ali@gmail.com',
+                phone_number: '09121111111',
+                job: '',
+                job_description: ''
             }}/>
         </div>
     );
