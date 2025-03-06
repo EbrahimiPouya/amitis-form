@@ -5,9 +5,11 @@ import StepLayout from "./StepLayout.tsx";
 
 interface IComponentProps{
     user: IUser;
+    onNext: ()=>void;
+    onPrev: ()=>void;
 }
 
-const ContactInfoStep = ({user}: IComponentProps) => {
+const ContactInfoStep = ({user, onNext, onPrev}: IComponentProps) => {
     const onChange = (e: ChangeEvent<HTMLInputElement>)=>{
         console.log(getTextFromEvent(e))
     }
@@ -18,10 +20,10 @@ const ContactInfoStep = ({user}: IComponentProps) => {
                 title={'اطلاعات تماس'}
                 hasNext={true}
                 nextLabel={'اطلاعات شغل'}
-                onNext={()=>{}}
+                onNext={onNext}
                 hasPrev={true}
                 prevLabel={'اطلاعات شخصی'}
-                onPrev={()=>{}}
+                onPrev={onPrev}
             >
             <input
                 type="text"
