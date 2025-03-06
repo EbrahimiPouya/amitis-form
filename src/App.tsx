@@ -1,8 +1,10 @@
+import CreateUserForm from "./pages/createUser";
+
 function App() {
 
   return (
     <>
-      <h1>Vite + React</h1>
+      <CreateUserForm/>
     </>
   )
 }
