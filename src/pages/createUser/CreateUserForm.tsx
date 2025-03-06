@@ -1,7 +1,12 @@
+import PersonalInfoStep from "./ui/PersonalInfoStep.tsx";
+
 const CreateUserForm = () => {
     return (
         <div>
-            multi step form
+            <PersonalInfoStep user={{
+                name: 'ali',
+                family: 'ali'
+            }}/>
         </div>
     );
 };
