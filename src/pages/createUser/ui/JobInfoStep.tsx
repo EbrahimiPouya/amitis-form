@@ -1,6 +1,7 @@
 import {IUser} from "../../../entities/user.ts";
 import {ChangeEvent} from "react";
 import {getTextFromEvent} from "../../../shared/util/text.ts";
+import StepLayout from "./StepLayout.tsx";
 
 interface IComponentProps{
     user: IUser;
@@ -13,7 +14,12 @@ const JobInfoStep = ({user}: IComponentProps) => {
 
     return (
         <div>
-            <h2>مرحله ۳: اطلاعات شغل</h2>
+            <StepLayout
+                title={'اطلاعات شغل'}
+                hasPrev={true}
+                prevLabel={'اطلاعات تماس'}
+                onPrev={()=>{}}
+            >
             <input
                 type="text"
                 placeholder="شغل"
@@ -26,8 +32,8 @@ const JobInfoStep = ({user}: IComponentProps) => {
                 value={user.job_description}
                 onChange={onChange}
             />
-            <button>اطلاعات تماس</button>
             <button>ایجاد کاربر</button>
+            </StepLayout>
         </div>
     );
 };

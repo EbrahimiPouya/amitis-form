@@ -1,6 +1,7 @@
 import {IUser} from "../../../entities/user.ts";
 import {ChangeEvent} from "react";
 import {getTextFromEvent} from "../../../shared/util/text.ts";
+import StepLayout from "./StepLayout.tsx";
 
 interface IComponentProps{
     user: IUser;
@@ -14,20 +15,28 @@ const PersonalInfoStep = ({user}: IComponentProps) => {
 
     return (
         <div>
-            <h2>مرحله ۱: اطلاعات شخصی</h2>
-            <input
-                type="text"
-                placeholder="نام"
-                defaultValue={user.name}
-                onChange={onChange}
-            />
-            <input
-                type="text"
-                placeholder="نام خانوادگی"
-                value={user.family}
-                onChange={onChange}
-            />
-            <button>اطلاعات تماس</button>
+            <StepLayout
+                title={'اطلاعات شخصی'}
+                hasNext={true}
+                nextLabel={'اطلاعات تماس'}
+                onNext={()=>{}}
+                >
+                <div >
+                    <input
+                        type="text"
+                        placeholder="نام"
+                        defaultValue={user.name}
+                        onChange={onChange}
+                    />
+                    <input
+                        type="text"
+                        placeholder="نام خانوادگی"
+                        value={user.family}
+                        onChange={onChange}
+                    />
+                </div>
+
+            </StepLayout>
         </div>
     );
 };
