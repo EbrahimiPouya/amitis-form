@@ -1,10 +1,10 @@
-import CreateUserForm from "./pages/createUser";
+import CreateUser from "./pages/createUser";
 
 function App() {
 
   return (
     <>
-      <CreateUserForm/>
+      <CreateUser/>
     </>
   )
 }
