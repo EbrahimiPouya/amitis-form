@@ -1,4 +1,4 @@
-import {useEffect, useReducer} from 'react';
+import {useCallback, useEffect, useReducer} from 'react';
 import CreateUserForm from "./CreateUserForm.tsx";
 import {IUser} from "../../entities/user.ts";
 import {emptyUser, initialFormData, removeLocalData, saveLocalData} from "./model/draft.ts";
@@ -76,32 +76,32 @@ const formReducer = (state: IFormState, action: TFormAction) => {
 const CreateUser = () => {
     const [state, dispatch] = useReducer(formReducer, {formData:initialFormData, historyIndex: -1, history: []})
 
-    const updateFormData = (key: keyof IUser, value: string) => {
+    const updateFormData = useCallback((key: keyof IUser, value: string) => {
         if (state.formData[key] === value) return;
         dispatch({ type: "UPDATE", payload: {key, oldValue: state.formData[key], newValue: value} });
-    };
+    }, [state, dispatch]);
 
-    const undo = () => {
+    const undo = useCallback(() => {
         dispatch({ type: 'UNDO'})
-    };
+    }, [dispatch]);
 
-    const redo = () => {
+    const redo = useCallback(() => {
         dispatch({ type: 'REDO'})
-    };
+    }, [dispatch]);
 
-    const resetHistory = ()=>{
+    const resetHistory = useCallback(()=>{
         dispatch({ type: 'RESET_HISTORY'})
-    }
+    }, [dispatch])
 
     useEffect(() => {
         saveLocalData(state.formData)
     }, [state.formData]);
 
-    const onSubmit  = ()=>{
+    const onSubmit  = useCallback(()=>{
         dispatch({ type: 'RESET'})
         removeLocalData();
         alert("کاربر ایجاد شد")
-    }
+    }, [dispatch]);
 
     return (
         <div>
