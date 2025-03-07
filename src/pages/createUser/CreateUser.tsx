@@ -21,9 +21,6 @@ const CreateUser = () => {
             job_description: ''
         });
 
-    console.log({formData})
-    console.log({history})
-
     const updateFormData = (key: keyof IUser, value: string) => {
         if (formData[key] === value) return;
         const newChange: IHistory = { key, oldValue:formData[key], newValue: value };
@@ -65,7 +62,7 @@ const CreateUser = () => {
             >
                 Redo
             </button>
-            
+
             <CreateUserForm
                 user={formData}
                 onChange={updateFormData}
