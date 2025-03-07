@@ -1,8 +1,8 @@
-import PersonalInfoStep from "./ui/PersonalInfoStep.tsx";
 import {IUser} from "../../entities/user.ts";
-import JobInfoStep from "./ui/JobInfoStep.tsx";
-import ContactInfoStep from "./ui/ContactInfoStep.tsx";
-import {useState} from "react";
+import {ChangeEvent, useState} from "react";
+import {stepsConfig} from './model/formConfig.ts'
+import StepLayout from "./ui/StepLayout.tsx";
+import {getTextFromEvent} from "../../shared/util/text.ts";
 
 const user: IUser = {
     name: 'ali',
@@ -14,36 +14,47 @@ const user: IUser = {
 }
 
 const CreateUserForm = () => {
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(0);
 
     const onNextStep=()=>{
-        setStep(prevState => prevState+1)
+        if(step < stepsConfig.length - 1){
+            setStep(prevState => prevState+1)
+        } else {
+            alert("کاربر ایجاد شد")
+        }
     }
     const onPrevStep=()=>{
         setStep(prevState => prevState-1)
     }
 
+    const onChange = (e: ChangeEvent<HTMLInputElement>)=>{
+        console.log(getTextFromEvent(e))
+    }
+
+
+    const currentStep = stepsConfig[step];
+
     return (
         <div>
-        {step === 1 &&
-            <PersonalInfoStep
-                user={user}
-                onNext={onNextStep}
-            />
-        }
-        {step === 2 &&
-            <ContactInfoStep
-                user={user}
-                onNext={onNextStep}
+            <StepLayout
+                title={currentStep.title}
+                hasPrev={step > 0}
+                hasNext={true}
+                prevLabel={step > 0 ? stepsConfig[step-1].title : ""}
+                nextLabel={step < stepsConfig.length - 1 ? stepsConfig[step+1].title : "ایجاد کاربر"}
                 onPrev={onPrevStep}
-            />
-        }
-        {step === 3 &&
-            <JobInfoStep
-                user={user}
-                onPrev={onPrevStep}
-            />
-        }
+                onNext={onNextStep}
+            >
+                {currentStep.fields.map((field) => (
+                    <input
+                        key={field.name}
+                        type={field.type}
+                        placeholder={field.placeholder}
+                        defaultValue={user[field.name]}
+                        onChange={onChange}
+                    />
+                ))}
+            </StepLayout>
         </div>
     );
 };
