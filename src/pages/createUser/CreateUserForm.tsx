@@ -8,9 +8,10 @@ interface IComponentProps{
     user: IUser;
     onChange: (key: keyof IUser, value: string)=>void;
     onChangeStep: ()=>void;
+    onSubmit: ()=>void;
 }
 
-const CreateUserForm = ({user, onChange, onChangeStep}: IComponentProps) => {
+const CreateUserForm = ({user, onChange, onChangeStep, onSubmit}: IComponentProps) => {
 
     const [step, setStep] = useState(0);
 
@@ -18,7 +19,7 @@ const CreateUserForm = ({user, onChange, onChangeStep}: IComponentProps) => {
         if(step < stepsConfig.length - 1){
             setStep(prevState => prevState+1)
         } else {
-            alert("کاربر ایجاد شد")
+            onSubmit();
         }
     }
     const onPrevStep=()=>{
