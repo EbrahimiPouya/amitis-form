@@ -4,7 +4,8 @@ import {IUser} from "../../entities/user.ts";
 
 interface IHistory{
     key: keyof IUser;
-    value: string;
+    oldValue: string;
+    newValue: string;
 }
 
 const CreateUser = () => {
@@ -20,9 +21,12 @@ const CreateUser = () => {
             job_description: ''
         });
 
+    console.log({formData})
+    console.log({history})
+
     const updateFormData = (key: keyof IUser, value: string) => {
         if (formData[key] === value) return;
-        const newChange = { key, value };
+        const newChange: IHistory = { key, oldValue:formData[key], newValue: value };
         const newHistory = history.slice(0, historyIndex + 1);
         setHistory([...newHistory, newChange]);
         setHistoryIndex(newHistory.length);
@@ -30,19 +34,15 @@ const CreateUser = () => {
     };
 
     const undo = () => {
-        if (historyIndex >= 0) {
-            const { key, value } = history[historyIndex];
-            setFormData((prev) => ({ ...prev, [key]: value }));
+            const { key, oldValue } = history[historyIndex];
+            setFormData((prev) => ({ ...prev, [key]: oldValue }));
             setHistoryIndex(historyIndex - 1);
-        }
     };
 
     const redo = () => {
-        if (historyIndex < history.length - 1) {
-            const { key, value } = history[historyIndex + 1];
-            setFormData((prev) => ({ ...prev, [key]: value }));
+            const { key, newValue } = history[historyIndex + 1];
+            setFormData((prev) => ({ ...prev, [key]: newValue }));
             setHistoryIndex(historyIndex + 1);
-        }
     };
 
     const resetHistory = ()=>{
@@ -53,17 +53,19 @@ const CreateUser = () => {
     return (
         <div>
 
-            {historyIndex > -1 && <button
+            <button
                 onClick={undo}
+                disabled={historyIndex === -1}
             >
                 Undo
-            </button>}
-            {historyIndex < history.length-1 && <button
+            </button>
+            <button
                 onClick={redo}
+                disabled={historyIndex === history.length-1}
             >
                 Redo
             </button>
-            }
+            
             <CreateUserForm
                 user={formData}
                 onChange={updateFormData}
