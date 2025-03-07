@@ -1,5 +1,5 @@
 import {IUser} from "../../entities/user.ts";
-import {ChangeEvent, useCallback, useEffect, useState} from "react";
+import {ChangeEvent, useCallback} from "react";
 import {stepsConfig} from './model/formConfig.ts'
 import StepLayout from "./ui/StepLayout.tsx";
 import {getTextFromEvent} from "../../shared/util/text.ts";
@@ -7,29 +7,13 @@ import {getTextFromEvent} from "../../shared/util/text.ts";
 interface IComponentProps{
     user: IUser;
     onChange: (key: keyof IUser, value: string)=>void;
-    onChangeStep: ()=>void;
-    onSubmit: ()=>void;
+    step: number;
+    onNextStep: ()=>void;
+    onPrevStep: ()=>void;
 }
 
-const CreateUserForm = ({user, onChange, onChangeStep, onSubmit}: IComponentProps) => {
+const CreateUserForm = ({user, onChange, onNextStep, onPrevStep, step}: IComponentProps) => {
 
-    const [step, setStep] = useState(0);
-
-    const onNextStep=useCallback(()=>{
-        if(step < stepsConfig.length - 1){
-            setStep(prevState => prevState+1)
-        } else {
-            onSubmit();
-        }
-    }, [step, setStep, onSubmit]);
-
-    const onPrevStep=useCallback(()=>{
-        setStep(prevState => prevState-1)
-    }, [setStep])
-
-    useEffect(() => {
-        onChangeStep();
-    }, [onChangeStep, step]);
 
     const onChangeGen = useCallback((key: keyof IUser)=>{
         return (e: ChangeEvent<HTMLInputElement>)=> onChange(key , getTextFromEvent(e))
