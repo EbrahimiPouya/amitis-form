@@ -1,19 +1,17 @@
 import {IUser} from "../../entities/user.ts";
-import {ChangeEvent, useState} from "react";
+import {ChangeEvent, useEffect, useState} from "react";
 import {stepsConfig} from './model/formConfig.ts'
 import StepLayout from "./ui/StepLayout.tsx";
 import {getTextFromEvent} from "../../shared/util/text.ts";
 
-const user: IUser = {
-    name: 'ali',
-    family: 'ali',
-    email: 'a.ali@gmail.com',
-    phone_number: '09121111111',
-    job: '',
-    job_description: ''
+interface IComponentProps{
+    user: IUser;
+    onChange: (key: keyof IUser, value: string)=>void;
+    onChangeStep: ()=>void;
 }
 
-const CreateUserForm = () => {
+const CreateUserForm = ({user, onChange, onChangeStep}: IComponentProps) => {
+
     const [step, setStep] = useState(0);
 
     const onNextStep=()=>{
@@ -27,10 +25,13 @@ const CreateUserForm = () => {
         setStep(prevState => prevState-1)
     }
 
-    const onChange = (e: ChangeEvent<HTMLInputElement>)=>{
-        console.log(getTextFromEvent(e))
-    }
+    useEffect(() => {
+        onChangeStep();
+    }, [step]);
 
+    const onChangeGen = (key: keyof IUser)=>{
+        return (e: ChangeEvent<HTMLInputElement>)=> onChange(key , getTextFromEvent(e))
+    }
 
     const currentStep = stepsConfig[step];
 
@@ -45,13 +46,14 @@ const CreateUserForm = () => {
                 onPrev={onPrevStep}
                 onNext={onNextStep}
             >
+
                 {currentStep.fields.map((field) => (
                     <input
                         key={field.name}
                         type={field.type}
                         placeholder={field.placeholder}
-                        defaultValue={user[field.name]}
-                        onChange={onChange}
+                        value={user[field.name]}
+                        onChange={onChangeGen(field.name)}
                     />
                 ))}
             </StepLayout>
