@@ -1,6 +1,7 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import CreateUserForm from "./CreateUserForm.tsx";
 import {IUser} from "../../entities/user.ts";
+import {initialFormData, removeLocalData, saveLocalData} from "./model/draft.ts";
 
 interface IHistory{
     key: keyof IUser;
@@ -11,15 +12,7 @@ interface IHistory{
 const CreateUser = () => {
     const [history, setHistory] = useState<IHistory[]>([]);
     const [historyIndex, setHistoryIndex] = useState<number>(-1);
-    const [formData, setFormData] = useState<IUser>(
-        {
-            name: 'ali',
-            family: 'ali',
-            email: 'a.ali@gmail.com',
-            phone_number: '09121111111',
-            job: '',
-            job_description: ''
-        });
+    const [formData, setFormData] = useState<IUser>(initialFormData);
 
     const updateFormData = (key: keyof IUser, value: string) => {
         if (formData[key] === value) return;
@@ -47,6 +40,17 @@ const CreateUser = () => {
         setHistoryIndex(-1)
     }
 
+    useEffect(() => {
+        saveLocalData(formData)
+    }, [formData]);
+
+    const onSubmit  = ()=>{
+        removeLocalData();
+        alert("کاربر ایجاد شد")
+        resetHistory();
+        setFormData(initialFormData)
+    }
+
     return (
         <div>
 
@@ -67,6 +71,7 @@ const CreateUser = () => {
                 user={formData}
                 onChange={updateFormData}
                 onChangeStep={resetHistory}
+                onSubmit={onSubmit}
             />
 
         </div>
