@@ -2,15 +2,16 @@ import {IUser} from "../../../entities/user.ts";
 const FORM_DATA_KEY = "formData"
 const localData = localStorage.getItem(FORM_DATA_KEY);
 
-export const initialFormData: IUser =
-    localData ? JSON.parse(localData) :
-    {   name: '',
+export const emptyUser : IUser = {   name: '',
         family: '',
         email: '',
         phone_number: '',
         job: '',
         job_description: ''
-    }
+}
+
+export const initialFormData: IUser =
+    localData ? JSON.parse(localData) : emptyUser
 
 export const saveLocalData = (formData: IUser)=>{
         localStorage.setItem(FORM_DATA_KEY, JSON.stringify(formData));

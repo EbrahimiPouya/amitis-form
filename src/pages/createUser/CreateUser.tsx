@@ -1,7 +1,7 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useReducer} from 'react';
 import CreateUserForm from "./CreateUserForm.tsx";
 import {IUser} from "../../entities/user.ts";
-import {initialFormData, removeLocalData, saveLocalData} from "./model/draft.ts";
+import {emptyUser, initialFormData, removeLocalData, saveLocalData} from "./model/draft.ts";
 
 interface IHistory{
     key: keyof IUser;
@@ -9,66 +9,118 @@ interface IHistory{
     newValue: string;
 }
 
-const CreateUser = () => {
-    const [history, setHistory] = useState<IHistory[]>([]);
-    const [historyIndex, setHistoryIndex] = useState<number>(-1);
-    const [formData, setFormData] = useState<IUser>(initialFormData);
+interface IFormState {
+    history: IHistory[];
+    historyIndex: number;
+    formData: IUser;
+}
 
-    const updateFormData = (key: keyof IUser, value: string) => {
-        if (formData[key] === value) return;
-        const newChange: IHistory = { key, oldValue:formData[key], newValue: value };
-        const newHistory = history.slice(0, historyIndex + 1);
-        setHistory([...newHistory, newChange]);
-        setHistoryIndex(newHistory.length);
-        setFormData((prev) => ({ ...prev, [key]: value }));
-    };
 
-    const undo = () => {
-            const { key, oldValue } = history[historyIndex];
-            setFormData((prev) => ({ ...prev, [key]: oldValue }));
-            setHistoryIndex(historyIndex - 1);
-    };
+type TFormAction =
+    | { type: "UPDATE"; payload: IHistory }
+    | { type: "UNDO" }
+    | { type: "REDO" }
+    | { type: "RESET_HISTORY" }
+    | { type: "RESET" };
 
-    const redo = () => {
-            const { key, newValue } = history[historyIndex + 1];
-            setFormData((prev) => ({ ...prev, [key]: newValue }));
-            setHistoryIndex(historyIndex + 1);
-    };
-
-    const resetHistory = ()=>{
-        setHistory([])
-        setHistoryIndex(-1)
+const formReducer = (state: IFormState, action: TFormAction) => {
+    switch (action.type) {
+        case "UPDATE":
+            return {
+                history: [
+                    ...state.history.slice(0, state.historyIndex + 1),
+                    {
+                        key: action.payload.key,
+                        oldValue:state.formData[action.payload.key],
+                        newValue: action.payload.newValue
+                    }
+                ],
+                historyIndex: state.historyIndex + 1,
+                formData: { ...state.formData, [action.payload.key]: action.payload.newValue }
+            };
+        case "UNDO":
+            return {
+                ...state,
+                historyIndex: state.historyIndex -1,
+                formData: {
+                    ...state.formData ,
+                    [state.history[state.historyIndex].key]: state.history[state.historyIndex].oldValue
+                }
+            };
+        case "REDO":
+            return {
+                ...state,
+                historyIndex: state.historyIndex +1,
+                formData: {
+                    ...state.formData ,
+                    [state.history[state.historyIndex+1].key]: state.history[state.historyIndex+1].newValue
+                }
+            };
+        case "RESET_HISTORY":
+            return {
+                ...state,
+                historyIndex: -1,
+                history: []
+            };
+        case "RESET":
+            return {
+                historyIndex: -1,
+                history: [],
+                formData: emptyUser,
+            };
+        default:
+            return state;
     }
+};
+
+const CreateUser = () => {
+    const [state, dispatch] = useReducer(formReducer, {formData:initialFormData, historyIndex: -1, history: []})
+
+    const updateFormData = useCallback((key: keyof IUser, value: string) => {
+        if (state.formData[key] === value) return;
+        dispatch({ type: "UPDATE", payload: {key, oldValue: state.formData[key], newValue: value} });
+    }, [state, dispatch]);
+
+    const undo = useCallback(() => {
+        dispatch({ type: 'UNDO'})
+    }, [dispatch]);
+
+    const redo = useCallback(() => {
+        dispatch({ type: 'REDO'})
+    }, [dispatch]);
+
+    const resetHistory = useCallback(()=>{
+        dispatch({ type: 'RESET_HISTORY'})
+    }, [dispatch])
 
     useEffect(() => {
-        saveLocalData(formData)
-    }, [formData]);
+        saveLocalData(state.formData)
+    }, [state.formData]);
 
-    const onSubmit  = ()=>{
+    const onSubmit  = useCallback(()=>{
+        dispatch({ type: 'RESET'})
         removeLocalData();
         alert("کاربر ایجاد شد")
-        resetHistory();
-        setFormData(initialFormData)
-    }
+    }, [dispatch]);
 
     return (
         <div>
 
             <button
                 onClick={undo}
-                disabled={historyIndex === -1}
+                disabled={state.historyIndex === -1}
             >
                 Undo
             </button>
             <button
                 onClick={redo}
-                disabled={historyIndex === history.length-1}
+                disabled={state.historyIndex === state.history.length-1}
             >
                 Redo
             </button>
 
             <CreateUserForm
-                user={formData}
+                user={state.formData}
                 onChange={updateFormData}
                 onChangeStep={resetHistory}
                 onSubmit={onSubmit}
